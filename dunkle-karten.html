@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dunkle Karten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --surface2: #1f1f1f;
+    --border: #2a2a2a;
+    --text: #f0ede8;
+    --muted: #666;
+    --accent: #e8d5a3;
+    --red: #c0392b;
+    --green: #27ae60;
+    --purple: #8e44ad;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+  #app { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 4px; color: var(--accent); line-height: 1; }
+  .tagline { font-size: 12px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2.5rem; }
+
+  /* JOIN */
+  .join-box { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 2rem; max-width: 400px; }
+  .field { margin-bottom: 1.25rem; }
+  .field label { display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .field input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 15px; padding: 10px 12px; border-radius: 2px; outline: none; transition: border-color .2s; }
+  .field input:focus { border-color: var(--accent); }
+  .err { color: var(--red); font-size: 13px; margin-bottom: .75rem; min-height: 18px; }
+  .logline { color: var(--muted); font-size: 12px; font-family: 'DM Mono', monospace; margin-bottom: .75rem; min-height: 16px; }
+
+  /* BUTTONS */
+  .btn { display: inline-block; padding: 10px 24px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; border: none; cursor: pointer; transition: all .15s; border-radius: 2px; }
+  .btn-primary { background: var(--accent); color: #111; }
+  .btn-primary:hover { background: #f5e4b5; }
+  .btn-primary:disabled { opacity: .4; cursor: default; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ROOM BAR */
+  .room-bar { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); padding: 1rem 1.25rem; border-radius: 4px; margin-bottom: 1.25rem; }
+  .room-code-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+  .room-code { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--accent); letter-spacing: 4px; }
+  .players-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .player-chip { font-size: 12px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border); display: flex; align-items: center; gap: 5px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .dg { background: var(--green); }
+  .da { background: #888; }
+  .dp { background: var(--purple); }
+
+  .share-hint { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; margin-bottom: 1rem; text-align: center; }
+
+  /* SCORES */
+  .scores { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .score-chip { background: var(--surface); border: 1px solid var(--border); padding: 6px 14px; font-size: 13px; border-radius: 2px; }
+  .score-chip strong { color: var(--accent); }
+
+  /* PHASE BAR */
+  .phase-bar { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 8px 0; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+
+  /* BLACK CARD */
+  .black-card { background: var(--accent); color: #111; border-radius: 4px; padding: 2rem; margin-bottom: 1.5rem; position: relative; }
+  .black-card .lbl { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; opacity: .5; margin-bottom: 12px; }
+  .black-card .prompt { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; line-height: 1.3; }
+
+  /* WINNER BOX */
+  .winner-box { background: var(--surface2); border: 1px solid var(--green); border-radius: 4px; padding: 1.5rem; text-align: center; margin-bottom: 1.25rem; display: none; }
+  .winner-box h2 { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--green); margin-bottom: 6px; }
+  .winner-box p { font-size: 14px; color: var(--muted); font-style: italic; }
+
+  /* ANSWERS GRID */
+  .answers-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+  @media(max-width:600px){ .answers-grid { grid-template-columns: 1fr; } }
+  .ans-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1rem; cursor: pointer; transition: border-color .15s, background .15s; }
+  .ans-card:hover { border-color: #444; background: var(--surface2); }
+  .ans-card.myvote { border-color: var(--purple); }
+  .ans-card.winner { border-color: var(--green); background: rgba(39,174,96,.07); }
+  .ans-card .tag { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+  .ans-card textarea { width: 100%; background: transparent; border: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; resize: none; outline: none; min-height: 60px; }
+  .ans-card .body { font-size: 14px; color: var(--text); line-height: 1.5; font-style: italic; }
+
+  .btns { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+  .status-msg { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: .75rem; text-align: right; }
+
+  /* LOADING */
+  #loading { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; flex-direction: column; gap: 12px; }
+  #loading .logo { font-size: 42px; }
+  #loading p { font-size: 12px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+  .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="logo">Dunkle Karten</div>
+  <div class="spinner"></div>
+  <p>Firebase wird geladen...</p>
+</div>
+
+<div id="app" style="display:none">
+  <div class="logo">Dunkle Karten</div>
+  <div class="tagline">schwarzer humor · zwei spieler · ein ki-mitspieler</div>
+
+  <!-- JOIN -->
+  <div id="join-panel">
+    <div class="join-box">
+      <div class="field">
+        <label>Dein Name</label>
+        <input type="text" id="iName" placeholder="z.B. Klaus" maxlength="18" autocomplete="off"/>
+      </div>
+      <div class="field">
+        <label>Raum-Code (leer = neuen Raum erstellen)</label>
+        <input type="text" id="iRoom" placeholder="z.B. ABCD1" maxlength="6" autocomplete="off" style="text-transform:uppercase"/>
+      </div>
+      <div class="err" id="errMsg"></div>
+      <div class="logline" id="logMsg"></div>
+      <button class="btn btn-primary" id="btnJoin" onclick="handleJoin()">Beitreten / Erstellen</button>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div id="game-panel" style="display:none">
+    <div class="room-bar">
+      <div>
+        <div class="room-code-label">Raum-Code</div>
+        <div class="room-code" id="dispCode">-----</div>
+      </div>
+      <div class="players-row" id="dispPlayers"></div>
+    </div>
+    <div class="share-hint" id="shareHint"></div>
+    <div class="scores" id="dispScores"></div>
+    <div class="phase-bar" id="dispPhase">...</div>
+    <div class="black-card"><div class="lbl">Schwarze Karte</div><div class="prompt" id="dispPrompt">...</div></div>
+    <div class="winner-box" id="winnerBox"><h2 id="winnerTitle"></h2><p id="winnerSub"></p></div>
+    <div class="answers-grid" id="dispAnswers"></div>
+    <div class="btns" id="dispBtns"></div>
+    <div class="status-msg" id="dispStatus"></div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// ── Firebase config (free Spark plan, no auth needed) ──────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyDemo_REPLACE_WITH_YOUR_KEY",
+  authDomain: "dunkle-karten.firebaseapp.com",
+  databaseURL: "https://dunkle-karten-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "dunkle-karten",
+  storageBucket: "dunkle-karten.appspot.com",
+  appId: "1:000000000000:web:0000000000000000"
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
+// NOTE FOR SETUP: The above config needs a real Firebase project.
+// See setup instructions at the bottom of this page.
+// ──────────────────────────────────────────────────────────────────────────────
+
+const PROMPTS = [
+  "Das neue Sondervermögen wird hauptsächlich ausgegeben für: ___.",
+  "Friedrich Merz' heimliches Hobby ist ___.",
+  "Der Bundestag beschloss einstimmig: Ab sofort ist ___ Pflicht.",
+  "Die AfD schlägt als Lösung für den Fachkräftemangel vor: ___.",
+  "Putin rief an und flüsterte nur: '___. Du verstehst schon.'",
+  "Das EU-Parlament hat entschieden: ___ ist ab heute illegal.",
+  "Elon Musk twitterte um 3 Uhr nachts: 'Ich habe gerade ___ erfunden.'",
+  "Im Notfallkoffer der Bundesregierung befindet sich: ___.",
+  "Der Papst gestand live im TV: 'Im Vatikan läuft täglich ___.'",
+  "Laut Studie sind Deutsche glücklicher, seitdem ___ verboten wurde.",
+  "Habeck erklärte im TV: '___ – aber das ist natürlich komplex.'",
+  "Die neue KI-Verordnung schreibt vor: Alle Bots müssen sich als ___ vorstellen.",
+  "Als das Internet eine Stunde ausfiel, begannen die Menschen mit ___.",
+  "Trump unterzeichnete: Ab heute heißt Kanada offiziell ___.",
+  "Der neue Spiegel-Bestseller: 'Wie ich durch ___ die Rente rettete.'",
+  "Bayern führte als erstes Bundesland ___ ein.",
+  "Die NASA entdeckte auf dem Mars eindeutige Spuren von ___.",
+  "Das beliebteste Gesprächsthema auf deutschen Partys: ___.",
+  "Die neue Tinder-Pflichtangabe in Deutschland: ___.",
+  "Der Bundestag wurde offiziell umbenannt in: '___ mit Mikrofon'.",
+  "Das Arbeitsamt bietet jetzt folgende Umschulung an: ___.",
+  "Schweizer stimmten ab: ___ ist jetzt Menschenrecht.",
+  "Der neue NATO-Notfallplan sieht vor: Im Ernstfall ___ einsetzen.",
+  "Das Finanzamt akzeptiert neuerdings ___ als Steuerabschreibung.",
+  "Die WHO erklärt: ___ ist die häufigste Todesursache bei Deutschen über 40.",
+  "Das neue Pflichtfach in Schulen: ___.",
+  "Als Ersatz für Heizung empfiehlt die Bundesregierung: ___.",
+  "Der Verfassungsschutz beobachtet jetzt auch ___.",
+  "Das meistgegoogelte Wort 2025 in Deutschland: ___.",
+  "Laut KI-Prognose wird ___ der Beruf der Zukunft.",
+];
+
+const AI_POOL = [
+  "betreutes Influencern für Rentner",
+  "emotionale Unterstützungs-Panzer",
+  "Tübingen – aber schlechter",
+  "ein Kreissägen-Abo für den Mittelstand",
+  "freiwillige Selbstoptimierung mit Haftpflicht",
+  "ein Bürgergeldmodell exklusiv für Schafe",
+  "Demokratie auf Probe bis Jahresende",
+  "Ampel-Nostalgie als Kassenleistung",
+  "gezielte Unterforderung als Wachstumsstrategie",
+  "den deutschen Humor endlich abschaffen",
+  "unbezahlte Überstunden für die Seele",
+  "digitalen Weltschmerz gegen Aufpreis",
+  "vegane Kriegsführung",
+  "KI-generierten Scheuklappenoptimismus",
+  "den Bundestag durch eine Teambesprechung ersetzen",
+  "eine Entschuldigung auf ausdrücklichen Wunsch",
+  "Pflicht-Yoga für Lobbyisten",
+  "subventionierte Existenzkrise",
+  "Bundeswehr-Praktikum ab 12",
+  "eine Wartenummer für den gesellschaftlichen Zusammenhalt",
+  "Datenschutz-Konfetti",
+  "das bedingungslose Grundschuldgefühl",
+  "Olaf Scholz als Standard-KI-Stimme",
+  "Cannabis auf Rezept, Humor leider nicht",
+  "Grenzwertpolitik im Doppelpack mit Sahnehäubchen",
+  "Söders Lederhose als Staatssymbol",
+  "verpflichtende Bürokratie-Entschlackungsbürokratie",
+  "ein Soli nur für Leute, die ihn nicht zahlen wollen",
+  "einen Ausschuss, der Ausschüsse abschafft",
+  "Beziehungstherapie mit dem Verfassungsgericht",
+];
+
+let db, myName = '', myRoom = '', unsubscribe = null;
+
+function rnd(n) { return Math.floor(Math.random() * n); }
+function genCode() {
+  const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = ''; for (let i = 0; i < 5; i++) s += c[rnd(c.length)]; return s;
+}
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showErr(m) { const e = document.getElementById('errMsg'); e.textContent = m; }
+function setLog(m) { document.getElementById('logMsg').textContent = m; }
+
+// ── Init Firebase ────────────────────────────────────────────────────────────
+try {
+  const app = initializeApp(firebaseConfig);
+  db = getDatabase(app);
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+} catch(e) {
+  document.getElementById('loading').innerHTML = `
+    <div class="logo">Dunkle Karten</div>
+    <p style="color:#c0392b;max-width:380px;text-align:center;line-height:1.6;font-size:13px;">
+      Firebase nicht konfiguriert.<br/>Bitte Setup-Anleitung unten folgen.
+    </p>`;
+}
+
+// ── Room helpers ─────────────────────────────────────────────────────────────
+async function roomGet(code) {
+  const snap = await get(ref(db, 'rooms/' + code));
+  return snap.exists() ? snap.val() : null;
+}
+async function roomSet(code, data) {
+  await set(ref(db, 'rooms/' + code), data);
+}
+async function roomUpdate(code, patch) {
+  await update(ref(db, 'rooms/' + code), patch);
+}
+function roomListen(code, cb) {
+  const r = ref(db, 'rooms/' + code);
+  return onValue(r, snap => { if (snap.exists()) cb(snap.val()); });
+}
+
+// ── Join / Create ────────────────────────────────────────────────────────────
+window.handleJoin = async function() {
+  showErr(''); setLog('');
+  const name = document.getElementById('iName').value.trim();
+  let code = document.getElementById('iRoom').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if (!name) { showErr('Bitte einen Namen eingeben.'); return; }
+  const btn = document.getElementById('btnJoin');
+  btn.disabled = true;
+
+  try {
+    if (!code) {
+      setLog('Erstelle Raum...');
+      code = genCode();
+      const pi = rnd(PROMPTS.length);
+      const room = {
+        players: { [name]: { ts: Date.now() } },
+        phase: 'waiting', round: 0, promptIndex: pi,
+        answers: {}, aiAnswer: AI_POOL[rnd(AI_POOL.length)],
+        scores: { [name]: 0, 'NaziStapel': 0 },
+        votes: {}, shuffled: [], winnerKey: '', winnerName: '', winnerText: ''
+      };
+      await roomSet(code, room);
+      myName = name; myRoom = code;
+      startGame();
+    } else {
+      setLog('Suche Raum ' + code + '...');
+      const room = await roomGet(code);
+      if (!room) { showErr('Raum "' + code + '" nicht gefunden.'); btn.disabled = false; setLog(''); return; }
+      const patch = {};
+      patch['players/' + name] = { ts: Date.now() };
+      if (!room.scores) room.scores = {};
+      if (!room.scores[name]) patch['scores/' + name] = 0;
+      const pCount = Object.keys(room.players || {}).length;
+      if (pCount >= 1 && room.phase === 'waiting') patch.phase = 'writing';
+      await update(ref(db, 'rooms/' + code), patch);
+      myName = name; myRoom = code;
+      startGame();
+    }
+  } catch(e) {
+    showErr('Fehler: ' + e.message);
+    btn.disabled = false; setLog('');
+  }
+};
+
+function startGame() {
+  document.getElementById('join-panel').style.display = 'none';
+  document.getElementById('game-panel').style.display = 'block';
+  document.getElementById('dispCode').textContent = myRoom;
+  document.getElementById('shareHint').textContent =
+    'Raum-Code "' + myRoom + '" an deinen Freund schicken – er gibt ihn oben ein.';
+  if (unsubscribe) unsubscribe();
+  unsubscribe = roomListen(myRoom, render);
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+let selVote = null;
+
+function render(room) {
+  const players = Object.keys(room.players || {});
+
+  // Players
+  const pb = document.getElementById('dispPlayers');
+  pb.innerHTML = '';
+  players.forEach(p => {
+    const fresh = Date.now() - (room.players[p]?.ts || 0) < 15000;
+    const sp = document.createElement('span');
+    sp.className = 'player-chip';
+    sp.innerHTML = `<span class="dot ${fresh ? 'dg' : 'da'}"></span>${esc(p)}${p === myName ? ' <span style="color:var(--muted)">(du)</span>' : ''}`;
+    pb.appendChild(sp);
+  });
+  const aiSp = document.createElement('span');
+  aiSp.className = 'player-chip';
+  aiSp.innerHTML = `<span class="dot dp"></span>Na(ch)zi(eh)-Stapel`;
+  pb.appendChild(aiSp);
+
+  // Scores – map internal key back to display name
+  const sc = document.getElementById('dispScores');
+  sc.innerHTML = '';
+  Object.entries(room.scores || {}).forEach(([k, v]) => {
+    const display = k === 'NaziStapel' ? 'Na(ch)zi(eh)-Stapel' : k;
+    sc.innerHTML += `<div class="score-chip">${esc(display)}: <strong>${v}</strong></div>`;
+  });
+
+  document.getElementById('dispPrompt').textContent = PROMPTS[room.promptIndex] || PROMPTS[0];
+  document.getElementById('dispAnswers').innerHTML = '';
+  document.getElementById('dispBtns').innerHTML = '';
+  document.getElementById('dispStatus').textContent = '';
+  document.getElementById('winnerBox').style.display = 'none';
+
+  // Heartbeat
+  update(ref(db, 'rooms/' + myRoom + '/players/' + myName), { ts: Date.now() });
+
+  const ph = room.phase;
+  if (ph === 'waiting') {
+    document.getElementById('dispPhase').textContent = 'Warten auf zweiten Spieler';
+    document.getElementById('dispStatus').textContent = 'Teile den Raum-Code!';
+  }
+  else if (ph === 'writing') {
+    document.getElementById('dispPhase').textContent = 'Runde ' + (room.round + 1) + ' – Antwort eintippen';
+    const myDone = room.answers && room.answers[myName];
+    if (!myDone) {
+      const grid = document.getElementById('dispAnswers');
+      const c = document.createElement('div');
+      c.className = 'ans-card';
+      c.innerHTML = `<div class="tag"><span class="dot dg"></span> Deine Antwort</div>`;
+      const ta = document.createElement('textarea');
+      ta.placeholder = 'Hier eintippen...'; ta.rows = 3;
+      c.appendChild(ta); grid.appendChild(c);
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary'; btn.textContent = 'Einreichen';
+      btn.onclick = async () => {
+        const v = ta.value.trim();
+        if (!v) { alert('Bitte erst etwas eintippen!'); return; }
+        btn.disabled = true; btn.textContent = '...';
+        const patch = {};
+        patch['answers/' + myName] = v;
+        patch['players/' + myName] = { ts: Date.now() };
+        // Check if all human players answered
+        const rd = await roomGet(myRoom);
+        const others = Object.keys(rd.players || {}).filter(p => p !== myName);
+        const allDone = others.every(p => rd.answers && rd.answers[p]);
+        if (allDone) {
+          const keys = [...Object.keys(rd.answers || {}), myName, 'ai'];
+          const uniqueKeys = [...new Set([...Object.keys(rd.answers || {}), myName, 'ai'])];
+          const shuffled = uniqueKeys.sort(() => Math.random() - .5);
+          patch['answers/' + myName] = v;
+          patch.phase = 'reading';
+          patch.shuffled = shuffled;
+        }
+        await update(ref(db, 'rooms/' + myRoom), patch);
+        // If we were the last, need to re-check with our answer included
+        if (!allDone) {
+          // Check again now that our answer is saved
+          const rd2 = await roomGet(myRoom);
+          const allDone2 = Object.keys(rd2.players || {}).every(p => rd2.answers && rd2.answers[p]);
+          if (allDone2) {
+            const shuffled2 = [...Object.keys(rd2.answers), 'ai'].sort(() => Math.random() - .5);
+            await update(ref(db, 'rooms/' + myRoom), { phase: 'reading', shuffled: shuffled2 });
+          }
+        }
+      };
+      document.getElementById('dispBtns').appendChild(btn);
+    } else {
+      document.getElementById('dispStatus').textContent = 'Antwort eingereicht – warten auf anderen Spieler...';
+    }
+  }
+  else if (ph === 'reading') {
+    document.getElementById('dispPhase').textContent = 'Alle Antworten – anonym';
+    const grid = document.getElementById('dispAnswers');
+    const shuffled = Array.isArray(room.shuffled) ? room.shuffled : Object.values(room.shuffled || {});
+    shuffled.forEach(key => {
+      const text = key === 'ai' ? room.aiAnswer : (room.answers && room.answers[key]) || '';
+      const c = document.createElement('div');
+      c.className = 'ans-card';
+      c.innerHTML = `<div class="tag"><span class="dot da"></span> ?</div><div class="body">${esc(text)}</div>`;
+      grid.appendChild(c);
+    });
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-primary'; btn.textContent = 'Zur Abstimmung';
+    btn.onclick = async () => {
+      await update(ref(db, 'rooms/' + myRoom), { phase: 'voting', votes: {} });
+    };
+    document.getElementById('dispBtns').appendChild(btn);
+  }
+  else if (ph === 'voting') {
+    document.getElementById('dispPhase').textContent = 'Abstimmen – welche Antwort gewinnt?';
+    const myVoted = room.votes && room.votes[myName];
+    const grid = document.getElementById('dispAnswers');
+    const cards = []; selVote = null;
+    const shuffled = Array.isArray(room.shuffled) ? room.shuffled : Object.values(room.shuffled || {});
+    shuffled.forEach(key => {
+      const text = key === 'ai' ? room.aiAnswer : (room.answers && room.answers[key]) || '';
+      const c = document.createElement('div');
+      c.className = 'ans-card';
+      c.dataset.key = key;
+      c.innerHTML = `<div class="tag"><span class="dot da"></span> ?</div><div class="body">${esc(text)}</div>`;
+      if (!myVoted) {
+        c.onclick = () => { cards.forEach(x => x.classList.remove('myvote')); c.classList.add('myvote'); selVote = key; };
+      }
+      cards.push(c); grid.appendChild(c);
+    });
+    if (!myVoted) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary'; btn.textContent = 'Vote abgeben';
+      btn.onclick = async () => {
+        if (!selVote) { alert('Bitte eine Karte auswählen!'); return; }
+        btn.disabled = true; btn.textContent = '...';
+        const patch = {};
+        patch['votes/' + myName] = selVote;
+        patch['players/' + myName] = { ts: Date.now() };
+        await update(ref(db, 'rooms/' + myRoom), patch);
+        // Check if all voted
+        const rd = await roomGet(myRoom);
+        const allVoted = Object.keys(rd.players || {}).every(p => rd.votes && rd.votes[p]);
+        if (allVoted) {
+          const tally = {};
+          Object.values(rd.votes).forEach(v => { tally[v] = (tally[v] || 0) + 1; });
+          let topK = null, topN = 0;
+          Object.entries(tally).forEach(([k, n]) => { if (n > topN) { topN = n; topK = k; } });
+          const wn = topK === 'ai' ? 'NaziStapel' : topK;
+          const wt = topK === 'ai' ? rd.aiAnswer : (rd.answers && rd.answers[topK]) || '';
+          const scorePatch = {};
+          scorePatch['scores/' + wn] = (rd.scores && rd.scores[wn] || 0) + 1;
+          scorePatch.winnerKey = topK;
+          scorePatch.winnerName = wn;
+          scorePatch.winnerText = wt;
+          scorePatch.phase = 'result';
+          await update(ref(db, 'rooms/' + myRoom), scorePatch);
+        }
+      };
+      document.getElementById('dispBtns').appendChild(btn);
+    } else {
+      document.getElementById('dispStatus').textContent = 'Vote abgegeben – warten auf anderen Spieler...';
+    }
+  }
+  else if (ph === 'result') {
+    document.getElementById('dispPhase').textContent = 'Ergebnis der Runde';
+    const wb = document.getElementById('winnerBox');
+    wb.style.display = 'block';
+    const dispWinner = room.winnerName === 'NaziStapel' ? 'Na(ch)zi(eh)-Stapel' : room.winnerName;
+    document.getElementById('winnerTitle').textContent = 'Gewonnen: ' + dispWinner;
+    document.getElementById('winnerSub').textContent = '"' + (room.winnerText || '') + '"';
+    const grid = document.getElementById('dispAnswers');
+    const shuffled = Array.isArray(room.shuffled) ? room.shuffled : Object.values(room.shuffled || {});
+    shuffled.forEach(key => {
+      const isAi = key === 'ai';
+      const rn = isAi ? 'Na(ch)zi(eh)-Stapel' : key;
+      const text = isAi ? room.aiAnswer : (room.answers && room.answers[key]) || '';
+      const won = key === room.winnerKey;
+      const c = document.createElement('div');
+      c.className = 'ans-card' + (won ? ' winner' : '');
+      c.innerHTML = `<div class="tag"><span class="dot ${isAi ? 'dp' : won ? 'dg' : 'da'}"></span> ${esc(rn)}${won ? ' 🏆' : ''}</div><div class="body">${esc(text)}</div>`;
+      grid.appendChild(c);
+    });
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-primary'; btn.textContent = 'Nächste Runde';
+    btn.onclick = async () => {
+      const rd = await roomGet(myRoom);
+      const ni = (rd.promptIndex + 1) % PROMPTS.length;
+      await roomSet(myRoom, {
+        ...rd,
+        phase: 'writing', round: (rd.round || 0) + 1,
+        promptIndex: ni, answers: {}, votes: {},
+        aiAnswer: AI_POOL[rnd(AI_POOL.length)],
+        shuffled: [], winnerKey: '', winnerName: '', winnerText: ''
+      });
+    };
+    document.getElementById('dispBtns').appendChild(btn);
+  }
+}
+
+document.getElementById('iRoom').addEventListener('input', function() {
+  this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+});
+</script>
+
+<!-- Setup Instructions -->
+<div style="margin:4rem auto;max-width:720px;padding:0 1.5rem 3rem;font-family:'DM Mono',monospace;font-size:12px;color:#444;border-top:1px solid #1a1a1a;padding-top:2rem">
+  <p style="color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:1rem">⚙ Setup-Anleitung (einmalig, kostenlos)</p>
+  <ol style="line-height:2.2;padding-left:1.2rem;color:#555">
+    <li>Gehe zu <a href="https://console.firebase.google.com" style="color:#e8d5a3">console.firebase.google.com</a> → Neues Projekt erstellen (z.B. "dunkle-karten")</li>
+    <li>Im Projekt: <strong style="color:#888">Build → Realtime Database</strong> → Datenbank erstellen → Testmodus aktivieren</li>
+    <li>Gehe zu <strong style="color:#888">Projekteinstellungen → Deine Apps → Web-App</strong> hinzufügen → Config kopieren</li>
+    <li>In dieser HTML-Datei den <code style="color:#e8d5a3">firebaseConfig</code>-Block (ca. Zeile 130) mit deinen echten Werten ersetzen</li>
+    <li>Die fertige HTML-Datei auf <a href="https://pages.github.com" style="color:#e8d5a3">GitHub Pages</a> hochladen oder lokal öffnen – fertig!</li>
+  </ol>
+  <p style="margin-top:1rem;color:#444">Firebase Spark Plan ist dauerhaft kostenlos · 1 GB Speicher · 10 GB/Monat Traffic</p>
+</div>
+
+</body>
+</html>
