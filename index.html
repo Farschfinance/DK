@@ -148,18 +148,26 @@
 
 <!-- Firebase -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-// ── Firebase config (free Spark plan, no auth needed) ──────────────────────
-const firebaseConfig = {
-  apiKey: "AIzaSyDemo_REPLACE_WITH_YOUR_KEY",
-  authDomain: "dunkle-karten.firebaseapp.com",
-  databaseURL: "https://dunkle-karten-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "dunkle-karten",
-  storageBucket: "dunkle-karten.appspot.com",
-  appId: "1:000000000000:web:0000000000000000"
-};
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBK1rXAd67kukSHCBuDLPSYHB6DqXQTQbM",
+    authDomain: "dunkle-karten.firebaseapp.com",
+    databaseURL: "https://dunkle-karten-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "dunkle-karten",
+    storageBucket: "dunkle-karten.firebasestorage.app",
+    messagingSenderId: "638803247023",
+    appId: "1:638803247023:web:5d3ee6e40a836cca1e795a"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
+
 
 // ──────────────────────────────────────────────────────────────────────────────
 // NOTE FOR SETUP: The above config needs a real Firebase project.
