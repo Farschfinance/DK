@@ -175,6 +175,57 @@
 // ──────────────────────────────────────────────────────────────────────────────
 
 const PROMPTS = [
+  "Die Deutsche Bahn begründet die Verspätung heute mit ___.",
+"Der wahre Grund für den Untergang des Römischen Reiches: ___.",
+"Die Bundeswehr testet derzeit eine neue Geheimwaffe namens ___.",
+"Der durchschnittliche Deutsche denkt beim Wort 'Freiheit' zuerst an ___.",
+"Im Altersheim eskalierte die Stimmung wegen ___.",
+"Die Tagesschau verschwieg heute bewusst ___.",
+"Der neue Amazon-Service liefert jetzt auch ___ innerhalb von 30 Minuten.",
+"Nach dem dritten Weltkrieg wird die Menschheit nur noch ___ besitzen.",
+"Das letzte Geräusch vor dem Blackout: ___.",
+"Im RTL-Dschungelcamp starb beinahe jemand wegen ___.",
+"Der neue Trend unter CEOs: ___ zur Mitarbeiterbindung.",
+"Die Polizei konnte den Täter nur anhand von ___ identifizieren.",
+"Die katholische Kirche investiert neuerdings massiv in ___.",
+"Die wahre Ursache der Inflation: ___.",
+"Christian Lindner nennt es Wirtschaftspolitik, Experten nennen es ___.",
+"Das einzig Überlebende nach dem Atomkrieg: Kakerlaken und ___.",
+"Der durchschnittliche FDP-Wähler träumt heimlich von ___.",
+"Im Darknet kostet ein Kilo ___ inzwischen 4000 Euro.",
+"Die neue Realityshow auf Sat.1: 'Deutschland sucht den nächsten ___.',",
+"Der schlimmste Satz beim Tinder-Date: 'Übrigens stehe ich total auf ___.'",
+"Die Bundesregierung startet ein Pilotprojekt gegen Einsamkeit mit ___.",
+"Die nächste Pandemie beginnt wahrscheinlich durch ___.",
+"Der neue Lieferando-Service bringt jetzt auch ___ direkt an die Haustür.",
+"Im Silicon Valley arbeiten Forscher bereits an ___ als Ersatz für Menschen.",
+"Der wahre Inhalt von Überraschungseiern: ___.",
+"Die letzte Hoffnung der Menschheit: ___.",
+"Die Grünen fordern ein Tempolimit für ___.",
+"Im Knast gilt ___ inzwischen als Luxusgut.",
+"Das peinlichste, was man während einer OP sagen kann: '___.',",
+"Die Schweiz bleibt neutral — außer wenn es um ___ geht.",
+"Der neue Fetischtrend 2026: ___.",
+"Die KI verweigerte plötzlich jede Antwort zum Thema ___.",
+"Die reichsten 1% besitzen mittlerweile fast den gesamten Markt für ___.",
+"Der BND überwacht jetzt heimlich auch ___.",
+"Die neue Dating-App vermittelt Menschen anhand von ___.",
+"Der Vatikan exkommuniziert ab sofort jeden mit ___.",
+"Das schlimmste Mitbringsel aus dem Urlaub: ___.",
+"Das Jugendwort des Jahres wurde überraschend: '___.'",
+"Die letzte Nachricht der Menschheit an Außerirdische bestand aus ___.",
+"Die Bundeswehr scheiterte erneut an ___.",
+"Der neue Ernährungstrend unter Influencern: ___.",
+"Der einzige Job, den KI niemals übernehmen wird: ___.",
+"Der Grund, warum Aliens nie wieder auf der Erde landeten: ___.",
+"Die neue Netflix-Doku enthüllt schockierende Details über ___.",
+"Das Ordnungsamt verhängte Bußgelder wegen ___.",
+"Im Kapitalismus gewinnt am Ende immer ___.",
+"Die WHO warnt jetzt offiziell vor den Nebenwirkungen von ___.",
+"Der geheimste Ort im Kanzleramt enthält ___.",
+"Die Menschheit hätte gerettet werden können — wenn nicht für ___.",
+"Der wahre Endgegner deutscher Bürokratie: ___.",
+"Die letzte funktionierende Industrie in Deutschland: ___.",
   "Das neue Sondervermögen wird hauptsächlich ausgegeben für: ___.",
   "Friedrich Merz' heimliches Hobby ist ___.",
   "Der Bundestag beschloss einstimmig: Ab sofort ist ___ Pflicht.",
@@ -208,6 +259,65 @@ const PROMPTS = [
 ];
 
 const AI_POOL = [
+  "eine emotionale Paywall für zwischenmenschliche Nähe",
+"Steuerhinterziehung mit Achtsamkeitszertifikat",
+"ein FDP-Mitglied mit Empathiesoftware",
+"CO₂-neutralen Klassismus",
+"ein verpflichtendes Burnout-Jahr nach dem Abi",
+"die Rückkehr des Faxgeräts als Freiheitsymbol",
+"einen patriotischen OnlyFans-Kanal",
+"algorithmische Einsamkeit im Familienpaket",
+"eine Wehrpflicht für LinkedIn-Coaches",
+"eine Rezession mit Premium-Features",
+"die vollständige Automatisierung menschlicher Enttäuschung",
+"einen Bahnstreik als spirituelle Erfahrung",
+"NFTs für Kirchensteuerzahler",
+"eine vegane Lederpeitsche für den Zeitgeist",
+"einen digitalen Stuhlkreis für Investmentbanker",
+"einen Betriebsrat für toxische Beziehungen",
+"eine Triggerwarnung vor der Realität",
+"den Thermomix der Endzeit",
+"eine App, die dir erklärt, warum du arm bist",
+"ein Startup gegen die Nebenwirkungen von Startups",
+"eine Black-Mirror-Folge mit schlechterer UI",
+"humanitäre Abschiebungen mit Treuepunkten",
+"einen Podcast über männliche Verletzlichkeit mit 14 Werbepartnern",
+"eine Lieferando-Flatrate für Antidepressiva",
+"die letzte funktionierende Demokratie als Abo-Modell",
+"ein Bußgeld wegen übertriebener Lebensfreude",
+"ein Pflichtpraktikum im Spätsommer der Zivilisation",
+"eine LinkedIn-Karriere trotz Persönlichkeit",
+"den Mindestlohn für Gefühle",
+"einen Yogakurs für Steuerfahnder",
+"betreutes Scheitern im öffentlichen Dienst",
+"ein Schulfach namens 'toxische Produktivität'",
+"eine Hotline für passive Aggression",
+"einen Innovationsgipfel mit Clowns und Beratern",
+"einen staatlich geprüften Alpha-Mann",
+"eine Preiserhöhung wegen zu viel Hoffnung",
+"eine Selbsthilfegruppe für Christian-Lindner-Fans",
+"die Digitalisierung von Warteschlangen",
+"einen Atombunker mit Open-Space-Konzept",
+"eine verpflichtende Midlife-Crisis ab 27",
+"ein feministisches Kryptowährungs-Mining-Kollektiv",
+"eine Gesichtserkennung für traurige Männer in Porsches",
+"ein Tempolimit für Narzissmus",
+"eine nachhaltige Form der Ausbeutung",
+"eine Bundesjugendspiele-Version von Klassenkampf",
+"eine KI, die nur mansplainen kann",
+"eine PowerPoint-Präsentation über den Untergang Europas",
+"ein Rammstein-Musical für Kindergeburtstage",
+"die Vorhaut der Leistungsgesellschaft",
+"einen Faxanschluss für digitale Souveränität",
+"ein Bonusprogramm für emotionale Verdrängung",
+"eine NATO-Intervention gegen schlechte Stimmung",
+"einen Wellnessurlaub im Spätskapitalismus",
+"eine Depression mit Startup-Mentalität",
+"einen Bachelor in kontrollierter Hoffnungslosigkeit",
+"eine Pride-Parade gesponsert von Rheinmetall",
+"eine Wärmepumpe mit Vaterkomplex",
+"eine Datenschutzverletzung zum Mitnehmen",
+"eine Sondersendung über das Liebesleben deutscher Bürokraten",
   "betreutes Influencern für Rentner",
   "emotionale Unterstützungs-Panzer",
   "Tübingen – aber schlechter",
@@ -538,19 +648,6 @@ document.getElementById('iRoom').addEventListener('input', function() {
   this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
 });
 </script>
-
-<!-- Setup Instructions -->
-<div style="margin:4rem auto;max-width:720px;padding:0 1.5rem 3rem;font-family:'DM Mono',monospace;font-size:12px;color:#444;border-top:1px solid #1a1a1a;padding-top:2rem">
-  <p style="color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:1rem">⚙ Setup-Anleitung (einmalig, kostenlos)</p>
-  <ol style="line-height:2.2;padding-left:1.2rem;color:#555">
-    <li>Gehe zu <a href="https://console.firebase.google.com" style="color:#e8d5a3">console.firebase.google.com</a> → Neues Projekt erstellen (z.B. "dunkle-karten")</li>
-    <li>Im Projekt: <strong style="color:#888">Build → Realtime Database</strong> → Datenbank erstellen → Testmodus aktivieren</li>
-    <li>Gehe zu <strong style="color:#888">Projekteinstellungen → Deine Apps → Web-App</strong> hinzufügen → Config kopieren</li>
-    <li>In dieser HTML-Datei den <code style="color:#e8d5a3">firebaseConfig</code>-Block (ca. Zeile 130) mit deinen echten Werten ersetzen</li>
-    <li>Die fertige HTML-Datei auf <a href="https://pages.github.com" style="color:#e8d5a3">GitHub Pages</a> hochladen oder lokal öffnen – fertig!</li>
-  </ol>
-  <p style="margin-top:1rem;color:#444">Firebase Spark Plan ist dauerhaft kostenlos · 1 GB Speicher · 10 GB/Monat Traffic</p>
-</div>
 
 </body>
 </html>
