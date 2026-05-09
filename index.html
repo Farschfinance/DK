@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Dunkle Karten</title>
+<title>Schlechte Karten</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -100,13 +100,13 @@
 <body>
 
 <div id="loading">
-  <div class="logo">Dunkle Karten</div>
+  <div class="logo">Schlechte Karten</div>
   <div class="spinner"></div>
   <p>Firebase wird geladen...</p>
 </div>
 
 <div id="app" style="display:none">
-  <div class="logo">Dunkle Karten</div>
+  <div class="logo">Schlechte Karten</div>
   <div class="tagline">schwarzer humor · zwei spieler · ein ki-mitspieler</div>
 
   <!-- JOIN -->
@@ -353,7 +353,13 @@ const AI_POOL = [
   "Beziehungstherapie mit dem Verfassungsgericht",
 ];
 
-let db, myName = '', myRoom = '', unsubscribe = null;
+let db,
+    myName = '',
+    myRoom = '',
+    unsubscribe = null,
+    heartbeatInterval = null,
+    draftAnswer = '',
+    lastPhase = null;
 
 function rnd(n) { return Math.floor(Math.random() * n); }
 function genCode() {
@@ -374,7 +380,7 @@ try {
   document.getElementById('app').style.display = 'block';
 } catch(e) {
   document.getElementById('loading').innerHTML = `
-    <div class="logo">Dunkle Karten</div>
+    <div class="logo">Schlechte Karten</div>
     <p style="color:#c0392b;max-width:380px;text-align:center;line-height:1.6;font-size:13px;">
       Firebase nicht konfiguriert.<br/>Bitte Setup-Anleitung unten folgen.
     </p>`;
@@ -443,17 +449,40 @@ window.handleJoin = async function() {
 function startGame() {
   document.getElementById('join-panel').style.display = 'none';
   document.getElementById('game-panel').style.display = 'block';
+
   document.getElementById('dispCode').textContent = myRoom;
+
   document.getElementById('shareHint').textContent =
     'Raum-Code "' + myRoom + '" an deinen Freund schicken – er gibt ihn oben ein.';
+
   if (unsubscribe) unsubscribe();
+
   unsubscribe = roomListen(myRoom, render);
+
+  // Heartbeat nur alle 5 Sekunden
+  if (heartbeatInterval) clearInterval(heartbeatInterval);
+
+  heartbeatInterval = setInterval(() => {
+    if (!myRoom || !myName) return;
+
+    update(
+      ref(db, 'rooms/' + myRoom + '/players/' + myName),
+      { ts: Date.now() }
+    );
+  }, 5000);
 }
 
 // ── Render ───────────────────────────────────────────────────────────────────
 let selVote = null;
 
 function render(room) {
+
+  // Verhindert Dauer-Render während man schreibt
+  if (room.phase === lastPhase && room.phase === 'writing') {
+    return;
+  }
+
+  lastPhase = room.phase; document.getElementById('dispBtns').innerHTML = '';
   const players = Object.keys(room.players || {});
 
   // Players
@@ -486,7 +515,7 @@ function render(room) {
   document.getElementById('winnerBox').style.display = 'none';
 
   // Heartbeat
-  update(ref(db, 'rooms/' + myRoom + '/players/' + myName), { ts: Date.now() });
+ 
 
   const ph = room.phase;
   if (ph === 'waiting') {
@@ -501,8 +530,17 @@ function render(room) {
       const c = document.createElement('div');
       c.className = 'ans-card';
       c.innerHTML = `<div class="tag"><span class="dot dg"></span> Deine Antwort</div>`;
-      const ta = document.createElement('textarea');
-      ta.placeholder = 'Hier eintippen...'; ta.rows = 3;
+const ta = document.createElement('textarea');
+
+ta.placeholder = 'Hier eintippen...';
+ta.rows = 3;
+
+// lokalen Draft behalten
+ta.value = draftAnswer;
+
+ta.addEventListener('input', () => {
+  draftAnswer = ta.value;
+});
       c.appendChild(ta); grid.appendChild(c);
       const btn = document.createElement('button');
       btn.className = 'btn btn-primary'; btn.textContent = 'Einreichen';
@@ -525,7 +563,7 @@ function render(room) {
           patch.phase = 'reading';
           patch.shuffled = shuffled;
         }
-        await update(ref(db, 'rooms/' + myRoom), patch);
+        await update(ref(db, 'rooms/' + myRoom), patch); draftAnswer = '';
         // If we were the last, need to re-check with our answer included
         if (!allDone) {
           // Check again now that our answer is saved
